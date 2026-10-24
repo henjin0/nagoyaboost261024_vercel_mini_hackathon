@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>刈谷 → 東京駅｜ドライブルート</title>
+<style>
+  :root {
+    --blue: #1769e0;
+    --navy: #10243a;
+    --bg: #f2f5f9;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: #182334;
+    font-family: system-ui, -apple-system, "Noto Sans JP", sans-serif;
+  }
+  header {
+    padding: 26px 20px 50px;
+    color: white;
+    background: linear-gradient(125deg, #10243a, #1769e0);
+  }
+  .top, main { max-width: 900px; margin: auto; }
+  .brand { font-size: 12px; letter-spacing: .15em; opacity: .8; }
+  h1 { font-size: clamp(25px, 5vw, 36px); margin: 14px 0 8px; }
+  header p { margin: 0; font-size: 14px; opacity: .85; }
+  main { padding: 0 16px 40px; margin-top: -28px; }
+  .card {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 28px #17324d0c;
+  }
+  .label {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    margin-bottom: 12px;
+  }
+  .route-row { display: flex; gap: 13px; align-items: stretch; }
+  .route-icons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: #16a36a; }
+  .dot.end { background: #e64b4b; }
+  .line { flex: 1; border-left: 2px dashed #c7d1df; margin: 5px 0; }
+  .locations { flex: 1; min-width: 0; }
+  .place {
+    border: 1px solid #e0e7f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .place:last-child { margin-bottom: 0; }
+  .place small { color: var(--muted); font-size: 11px; }
+  .place strong { display: block; margin-top: 3px; font-size: 16px; }
+  .swap-note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .field-label { display: block; font-size: 12px; font-weight: 700; margin: 15px 0 7px; }
+  input {
+    width: 100%; padding: 13px 12px; border: 1px solid #d5deea;
+    border-radius: 10px; font-size: 15px; background: white;
+  }
+  input:focus { outline: 2px solid #9ec5ff; border-color: var(--blue); }
+  .options { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; margin-top: 18px; }
+  .option {
+    border: 1px solid #dbe3ed; background: white; color: #334155;
+    border-radius: 12px; padding: 13px 5px; cursor: pointer;
+    font-size: 12px; line-height: 1.7;
+  }
+  .option.active { border: 2px solid var(--blue); background: #edf5ff; color: #1459bd; padding: 12px 4px; }
+  .option span { display: block; font-size: 20px; }
+  button { font-family: inherit; }
+  .primary {
+    width: 100%; border: 0; border-radius: 12px; padding: 16px;
+    margin-top: 16px; background: var(--blue); color: white;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .primary:hover { background: #0e57c5; }
+  .secondary {
+    width: 100%; border: 1px solid #d5deea; border-radius: 11px;
+    padding: 13px; background: white; color: #1d4f91;
+    font-weight: 600; cursor: pointer; margin-top: 10px;
+  }
+  .map-frame {
+    width: 100%; height: 320px; border: 0; border-radius: 13px;
+    background: #e8eef5;
+  }
+  .map-placeholder {
+    min-height: 230px; border-radius: 13px; padding: 24px;
+    background: linear-gradient(145deg,#e6f1e7,#e9f0fa);
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center;
+  }
+  .map-placeholder .emoji { font-size: 40px; }
+  .map-placeholder p { color: #526579; font-size: 13px; line-height: 1.8; }
+  .map-placeholder strong { font-size: 18px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info {
+    border-radius: 12px; background: #f4f7fb; padding: 15px;
+  }
+  .info small { display: block; color: var(--muted); font-size: 11px; }
+  .info strong { display: block; font-size: 17px; margin-top: 5px; }
+  .notice { color: var(--muted); font-size: 11px; line-height: 1.8; margin: 14px 2px 0; }
+  .tag {
+    display: inline-block; font-size: 10px; color: #166534;
+    background: #dcfce7; padding: 4px 8px; border-radius: 20px;
+  }
+  footer { text-align: center; color: #8290a1; font-size: 11px; padding: 0 15px 30px; }
+  @media(max-width: 520px) {
+    .card { padding: 17px; }
+    .options { gap: 6px; }
+    .option { font-size: 11px; }
+    .map-frame { height: 260px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand">DRIVE PLANNER · JAPAN</div>
+    <h1>刈谷から東京駅へ。</h1>
+    <p>目的地までのドライブを、スムーズに計画。</p>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <div class="label">YOUR ROUTE / ルート設定</div>
+    <div class="route-row">
+      <div class="route-icons">
+        <div class="dot"></div>
+        <div class="line"></div>
+        <div class="dot end"></div>
+      </div>
+      <div class="locations">
+        <div class="place">
+          <small>出発地</small>
+          <strong>刈谷市</strong>
+        </div>
+        <div class="place">
+          <small>目的地</small>
+          <strong>東京駅</strong>
+        </div>
+      </div>
+    </div>
+
+    <details>
+      <summary style="cursor:pointer;color:#1769e0;font-size:13px;margin-top:14px">
+        出発地・目的地を変更する
+      </summary>
+      <label class="field-label" for="origin">出発地</label>
+      <input id="origin" value="愛知県刈谷市" placeholder="出発地を入力">
+      <label class="field-label" for="destination">目的地</label>
+      <input id="destination" value="東京駅" placeholder="目的地を入力">
+    </details>
+
+    <div class="label" style="margin-top:23px">ROUTE OPTIONS / 経路オプション</div>
+    <div class="options">
+      <button class="option active" data-mode="normal" onclick="setMode('normal')">
+        <span>🚗</span>通常ルート
+      </button>
+      <button class="option" data-mode="tolls" onclick="setMode('tolls')">
+        <span>🛣️</span>有料道路を避ける
+      </button>
+      <button class="option" data-mode="highways" onclick="setMode('highways')">
+        <span>🌿</span>高速道路を避ける
+      </button>
+    </div>
+
+    <button class="primary" onclick="openRoute()">
+      Googleマップでルートを表示 ↗
+    </button>
+    <button class="secondary" onclick="showDestinationMap()">
+      東京駅周辺の地図を表示
+    </button>
+    <p class="notice">
+      ※ 経路オプションはGoogleマップの経路検索に反映します。実際の経路・所要時間・料金は、出発時刻や交通状況によって変わります。
+    </p>
+  </section>
+
+  <section class="card">
+    <div class="label">MAP / 地図プレビュー</div>
+    <div id="mapArea">
+      <div class="map-placeholder">
+        <div class="emoji">🗺️</div>
+        <strong>刈谷市 → 東京駅</strong>
+        <p>Googleマップでルートを開くと、<br>実際の走行経路・高速道路・所要時間を確認できます。</p>
+        <button class="primary" style="max-width:270px" onclick="openRoute()">
+          ルートを地図で確認
+        </button>
+      </div>
+    </div>
+    <p class="notice">
+      このプレビュー欄には東京駅周辺の地図を表示できます。出発地から目的地までの実際のルートは、下のボタンからGoogleマップでご確認ください。
+    </p>
+  </section>
+
+  <section class="card">
+    <div class="label">TRIP GUIDE / ドライブの目安</div>
+    <div class="info-grid">
+      <div class="info">
+        <small>移動距離の目安</small>
+        <strong>約 300〜350 km</strong>
+      </div>
+      <div class="info">
+        <small>運転時間の目安</small>
+        <strong>約 4〜5 時間</strong>
+      </div>
+      <div class="info">
+        <small>主な高速道路の候補</small>
+        <strong style="font-size:14px">伊勢湾岸道・新東名など</strong>
+      </div>
+      <div class="info">
+        <small>おすすめ</small>
+        <strong style="font-size:14px">途中で休憩を取る</strong>
+      </div>
+    </div>
+    <p class="notice">
+      距離・時間は出発地点や選択経路による概算で、リアルタイムの計測値ではありません。料金、渋滞、通行止め、休憩時間はGoogleマップや道路会社の情報で確認してください。
+    </p>
+  </section>
+</main>
+
+<footer>安全運転で、快適なドライブを。</footer>
+
+<script>
+let selectedMode = "normal";
+
+function setMode(mode) {
+  selectedMode = mode;
+  document.querySelectorAll(".option").forEach(button => {
+    button.classList.toggle("active", button.dataset.mode === mode);
+  });
+}
+
+function getRouteUrl() {
+  const origin = document.getElementById("origin").value.trim() || "愛知県刈谷市";
+  const destination = document.getElementById("destination").value.trim() || "東京駅";
+  const params = new URLSearchParams({
+    api: "1",
+    origin,
+    destination,
+    travelmode: "driving"
+  });
+
+  if (selectedMode === "tolls") params.set("avoid", "tolls");
+  if (selectedMode === "highways") params.set("avoid", "highways");
+
+  return "https://www.google.com/maps/dir/?" + params.toString();
+}
+
+function openRoute() {
+  window.open(getRouteUrl(), "_blank", "noopener,noreferrer");
+}
+
+function showDestinationMap() {
+  const destination = document.getElementById("destination").value.trim() || "東京駅";
+  const mapArea = document.getElementById("mapArea");
+  const url = "https://maps.google.com/maps?" +
+    new URLSearchParams({ q: destination, output: "embed" }).toString();
+
+  mapArea.innerHTML = "";
+  const iframe = document.createElement("iframe");
+  iframe.className = "map-frame";
+  iframe.title = "目的地周辺のGoogleマップ";
+  iframe.loading = "lazy";
+  iframe.referrerPolicy = "no-referrer-when-downgrade";
+  iframe.src = url;
+  mapArea.appendChild(iframe);
+}
+</script>
+</body>
+</html>
